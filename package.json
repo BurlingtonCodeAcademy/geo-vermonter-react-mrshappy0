@@ -1,0 +1,37 @@
+{
+  "name": "geo-vermonter-react",
+  "version": "1.0.0",
+  "description": "A geographic guessing game in Vermont",
+  "dependencies": {
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-scripts": "3.0.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "eject": "react-scripts eject",
+    "test": "cypress run"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "author": "Joshua Burke",
+  "license": "MIT",
+  "homepage": "https://github.com/BurlingtonCodeAcademy/geo-vermonter#readme",
+  "devDependencies": {
+    "cypress": "^3.0.2"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
