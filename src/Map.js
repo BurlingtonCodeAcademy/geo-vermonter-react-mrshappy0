@@ -27,11 +27,11 @@ class Map extends React.Component {
       ]
     })
 
-  //  this.map.zoomControl.remove();
-  //  this.map.scrollWheelZoom.disable();
-  //  this.map.touchZoom.disable();
-  //  this.map.dragging.disable();
-  //  this.map.keyboard.disable();
+   this.map.zoomControl.remove();
+   this.map.scrollWheelZoom.disable();
+   this.map.touchZoom.disable();
+   this.map.dragging.disable();
+   this.map.keyboard.disable();
 
     //add polygon
     this.props.polygon.addTo(this.map);
