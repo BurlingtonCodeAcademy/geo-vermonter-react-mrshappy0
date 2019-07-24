@@ -81,6 +81,7 @@ class App extends React.Component {
 	}
 
 	guessButton() {
+		document.getElementById('modalbox').style.display = "block";
 		this.setState({
 			guessDisabled: true
 		});
@@ -141,6 +142,7 @@ class App extends React.Component {
 						Isle, Lamoille, Orange, Orleans, Rutland, Washington, Windham,
 						Windsor
 					</div>
+					<div id="modalbox">Nonsense</div>
 					<div id="latlon">Latitude: {this.state.markerReveal.lat}, Longitude: {this.state.markerReveal.lng} County: {this.state.countyReveal}</div>
 				</div>
 				<button onClick={this.moveMarkerNorth}>Move marker North</button>
