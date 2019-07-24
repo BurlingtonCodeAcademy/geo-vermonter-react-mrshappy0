@@ -90,7 +90,7 @@ class App extends React.Component {
 		const { lat, lng } = this.state.markerPosition;
 		this.setState({
 			markerPosition: {
-				lat: lat + 0.005,
+				lat: lat + 0.001,
 				lng: lng + 0.0
 			}
 		});
@@ -100,7 +100,7 @@ class App extends React.Component {
 		const { lat, lng } = this.state.markerPosition;
 		this.setState({
 			markerPosition: {
-				lat: lat - 0.005,
+				lat: lat - 0.001,
 				lng: lng + 0.00
 			}
 		});
@@ -111,7 +111,7 @@ class App extends React.Component {
 		this.setState({
 			markerPosition: {
 				lat: lat + 0.00,
-				lng: lng + 0.005
+				lng: lng + 0.001
 			}
 		});
 	}
@@ -121,7 +121,7 @@ class App extends React.Component {
 		this.setState({
 			markerPosition: {
 				lat: lat + 0.000,
-				lng: lng - 0.005
+				lng: lng - 0.001
 			}
 		});
 	}
