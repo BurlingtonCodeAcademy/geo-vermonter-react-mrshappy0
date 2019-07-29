@@ -5,7 +5,7 @@ import leafletPip from "leaflet-pip"
 
 const style = {
 	width: "50%",
-	height: "500px"
+	height: "67vh"
 };
 
 class Map extends React.Component {
@@ -27,11 +27,11 @@ class Map extends React.Component {
       ]
     })
 
-   this.map.zoomControl.remove();
-   this.map.scrollWheelZoom.disable();
-   this.map.touchZoom.disable();
-   this.map.dragging.disable();
-   this.map.keyboard.disable();
+  //  this.map.zoomControl.remove();
+  //  this.map.scrollWheelZoom.disable();
+  //  this.map.touchZoom.disable();
+  //  this.map.dragging.disable();
+  //  this.map.keyboard.disable();
 
     //add polygon
     this.props.polygon.addTo(this.map);
@@ -62,7 +62,7 @@ class Map extends React.Component {
 
 	render() {
     return (
-    <div id="map" style={style} />
+    <div id="map" style={style}/>
     );
 	}
 }

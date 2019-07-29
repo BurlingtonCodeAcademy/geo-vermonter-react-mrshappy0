@@ -5,21 +5,37 @@ import leafletPip from "leaflet-pip";
 import L from "leaflet";
 import borderData from "./border";
 import counties from "./counties";
+import vermontMap from "./vermont-county-map.gif";
+import { ReactComponent as LocateButton} from "./assets/map-pin.svg"
+import { ReactComponent as LeftArrow} from "./assets/arrow-left.svg"
+import { ReactComponent as RightArrow} from "./assets/arrow-right.svg"
+import { ReactComponent as DownArrow} from "./assets/arrow-down.svg"
+import { ReactComponent as UpArrow} from "./assets/arrow-up.svg"
+import { NONAME } from "dns";
 
 class App extends React.Component {
 	constructor() {
 		super();
 		this.state = {
-			
+			message: "react is cool...",
+			date: null,
+			input: "", 
 			startButton: false,
 			guessDisabled: true,
 			quitDisabled: true,
+			returnDisabled: true,
 			startingPosition: { lat: 44.4759, lng: -73.2121 },
 			markerPosition: { lat: 44.4759, lng: -73.2121 },
-			markerReveal: {lat: null,lng: null},
+			markerReveal: {lat: null, lng: null},
 			countyReveal: null,
+			currentScore: {score: 1000},
 			polygon: L.geoJSON(borderData),
-			counties: L.geoJSON(counties)
+			counties: L.geoJSON(counties),
+			confirmation: true,
+			isGuessCorrect: false,
+			latLonStyle: 
+				"none" 
+			,
 		};
 		this.moveMarkerNorth = this.moveMarkerNorth.bind(this);
 		this.moveMarkerSouth = this.moveMarkerSouth.bind(this);
@@ -29,46 +45,105 @@ class App extends React.Component {
 		this.guessButton = this.guessButton.bind(this);
 		this.quitButton = this.quitButton.bind(this);
 		this.checkWithin = this.checkWithin.bind(this);
+		this.confirmButton = this.confirmButton.bind(this);
+		this.handleSubmit = this.handleSubmit.bind(this);
+		this.handleInputChange = this.handleInputChange.bind(this);
+	}
+
+	async componentDidMount() {
+		const response = await fetch ('/scores');
+		const scoresObj = await response.json();
+		console.log('the scores is: ', scoresObj);
+		this.setState ({
+			scores: scoresObj.scores,
+			date: scoresObj.date,
+		})
+	}
+
+	async handleSubmit(evt){
+		evt.preventDefault();
+		const response = await fetch('/scores', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body:	JSON.stringify({scores: this.state.input})
+		});
+		const results = await response.text();
+		if (results === 'Success') {
+			const nextResponse = await fetch('/scores')
+			const json = nextResponse.json()
+			this.setState({
+				scores: json.scores,
+				date: json.date
+			});
+		}
+	}
+
+	handleInputChange(e){
+		e.preventDefault();
+		this.setState({
+			input: e.target.value
+		});
+	}
+
+	confirmButton(){
+		const { score } = this.state.currentScore;
+		console.log(document.getElementById("countyselect").value);
+		console.log(this.state.countyReveal);
+		if (document.getElementById("countyselect").value.toUpperCase() === this.state.countyReveal) {
+			console.log("This should work!")
+			this.setState({
+				isGuessCorrect: true
+			});
+		}
+		if (document.getElementById("countyselect").value.toUpperCase() !== this.state.countyReveal) {
+			console.log("This should work!")
+			this.setState({
+				currentScore: {
+					score: score - 50
+				}
+			});
+		}
 	}
 
 	checkWithin() {
-    console.log("checking")
     let LatLon = this.randomLatLon();
-    console.log({theLayer: this.state.polygon})
     while(!leafletPip.pointInLayer(LatLon, this.state.polygon).length) {
       LatLon = this.randomLatLon();
     }
-    console.log({LatLon});
     return LatLon; 
   }
   
 	randomLatLon() {
-		let lat = Math.random(45.01666495 - 42.72693285) + 42.72693285;
-		let lng = -1 * (Math.random(73.43774001 - 71.46535674) + 71.46535674);
+		let lat = Math.random() * (45.00541896831666 - 42.730315121762715) + 42.730315121762715;
+		let lng = (Math.random() * (71.51022535353107 - 73.35218221090553) + 73.35218221090553) * -1;
 		return [lng, lat];
 	}
 
 	quitButton() {
+		document.getElementById('latlon').style.display = "inline-block";
 		let latlon = this.state.startingPosition;
-		const withinCounties = leafletPip.pointInLayer(this.state.startingPosition, this.state.counties);
-		console.log(withinCounties[0].feature.properties.CNTYNAME);
 		this.setState({
 			quitDisabled: true,
+			guessDisabled: true,
 			markerReveal: {
 				lat: latlon.lat,
 				lng: latlon.lng
-			},
-			countyReveal: withinCounties[0].feature.properties.CNTYNAME,
+			}
 		});
 	}
 
 	startButton() {
+		let latlon = this.state.startingPosition;
     let LatLonReturn = this.checkWithin();
+		let withinCounties = leafletPip.pointInLayer(LatLonReturn, this.state.counties);
     console.log({LatLonReturn})
 		this.setState({
 			startButton: true,
 			guessDisabled: false,
 			quitDisabled: false,
+			returnDisabled: false,
 			markerPosition: {
 				lat: LatLonReturn[1],
 				lng: LatLonReturn[0]
@@ -76,65 +151,100 @@ class App extends React.Component {
 			startingPosition: {
 				lat: LatLonReturn[1],
 				lng: LatLonReturn[0]
-			}
+			},
+			markerReveal: {
+				lat: LatLonReturn[1],
+				lng: LatLonReturn[1]
+			},
+			countyReveal: withinCounties[0].feature.properties.CNTYNAME,
 		});
 	}
 
+	returnButton () {
+		
+	}
+
 	guessButton() {
-		document.getElementById('modalbox').style.display = "block";
 		this.setState({
-			guessDisabled: true
+			guessDisabled: true,
+			confirmation: false
+
 		});
 	}
 
 	moveMarkerNorth() {
 		const { lat, lng } = this.state.markerPosition;
+		const { score } = this.state.currentScore;
 		this.setState({
 			markerPosition: {
 				lat: lat + 0.001,
 				lng: lng + 0.0
+			},
+			currentScore: {
+				score: score - 1
 			}
 		});
 	}
 
 	moveMarkerSouth() {
 		const { lat, lng } = this.state.markerPosition;
+		const { score } = this.state.currentScore;
 		this.setState({
 			markerPosition: {
 				lat: lat - 0.001,
 				lng: lng + 0.00
+			},
+			currentScore: {
+				score: score - 1
 			}
 		});
 	}
 	
 	moveMarkerEast() {
 		const { lat, lng } = this.state.markerPosition;
+		const { score } = this.state.currentScore;
 		this.setState({
 			markerPosition: {
 				lat: lat + 0.00,
 				lng: lng + 0.001
+			},
+			currentScore: {
+				score: score - 1
 			}
 		});
 	}
 
 	moveMarkerWest() {
 		const { lat, lng } = this.state.markerPosition;
+		const { score } = this.state.currentScore;
 		this.setState({
 			markerPosition: {
 				lat: lat + 0.000,
 				lng: lng - 0.001
+			},
+			currentScore: {
+				score: score - 1
 			}
 		});
 	}
-
-
 
 	render() {
 		const { markerPosition, startingPosition, polygon } = this.state;
 		return (
 			<div>
-				<Map markerPosition={markerPosition} startingPosition = {startingPosition} polygon={polygon} />
-				<div id="quit">
+				<h1>{this.state.scores}</h1>
+				<h3>{this.state.date}</h3>
+				<form onSubmit={this.handleSubmit} method="POST" action="/scores">
+					<label htmlFor="scores">Score here:</label><br></br>
+					<input onChange={this.handleInputChange} placeholder="write a scores"></input>
+					<input type="submit" value="New Scores"></input>
+				</form>
+				<div id="score">Your Current Score: {this.state.currentScore.score}</div>
+				<div id = "mapbox">
+					<Map markerPosition={markerPosition} startingPosition = {startingPosition} polygon={polygon} id="gamemap"/>
+					<img src = {vermontMap} alt="Vermont Map" id="vermontmap"/>	
+				</div>
+				<div>
 					Current markerPosition: lat: {startingPosition.lat}, lng:{" "}
 					{startingPosition.lng}
 					<div id="counties">
@@ -142,33 +252,79 @@ class App extends React.Component {
 						Isle, Lamoille, Orange, Orleans, Rutland, Washington, Windham,
 						Windsor
 					</div>
-					<div id="modalbox">Nonsense</div>
-					<div id="latlon">Latitude: {this.state.markerReveal.lat}, Longitude: {this.state.markerReveal.lng} County: {this.state.countyReveal}</div>
+					<div id="modalbox" style={this.state.confirmation ? {display: "none"} : {display: "block"}}>
+						<form action="">
+  						<select name="counties" id="countyselect">
+    						<option value="Addison">Addison</option>
+    						<option value="Bennington">Bennington</option>
+    						<option value="Caledonia">Caledonia</option>
+    						<option value="Chittenden">Chittenden</option>
+								<option value="Essex">Essex</option>
+								<option value="Franklin">Franklin</option>
+								<option value="Grand Isle">Grand Isle</option>
+								<option value="Lamoille">Lamoille</option>
+								<option value="Orange">Orange</option>
+								<option value="Orleans">Orleans</option>
+								<option value="Rutland">Rutland</option>
+								<option value="Washington">Washington</option>
+								<option value="Windham">Windham</option>
+								<option value="Windsor">Windsor</option>
+  						</select>
+  							<br></br>
+								<input type="button" id="modalGuess" value="Guess" onClick={this.confirmButton}></input>
+								<button id="cancel" onClick={this.quitButton}>
+									Cancel
+								</button>
+						</form>
+					</div>
+					<div id="modalwinbox"> </div>
+					<div id="latlon" style={this.state.isGuessCorrect ? {display: "inline-block"} : {display: "none"}}>Latitude: {this.state.markerReveal.lat}, Longitude: {this.state.markerReveal.lng} County: {this.state.countyReveal}</div>
 				</div>
-				<button onClick={this.moveMarkerNorth}>Move marker North</button>
-				<button onClick={this.moveMarkerSouth}>Move marker South</button>
-				<button onClick={this.moveMarkerEast}>Move marker East</button>
-				<button onClick={this.moveMarkerWest}>Move marker West</button>
-				<button
-					id="Start"
-					disabled={this.state.startButton}
-					onClick={this.startButton}
-				>
+				<div id="navbox">
+					<div id="navgrid">
+						<button className="navbuttons" id="N" onClick={this.moveMarkerNorth}>
+							<UpArrow/>
+						</button>
+						<button className="navbuttons" id="S" onClick={this.moveMarkerSouth}>
+							<DownArrow/>
+						</button>
+						<button className="navbuttons" id="E" onClick={this.moveMarkerEast}>
+							<RightArrow/>
+						</button>
+						<button className="navbuttons" id="W" onClick={this.moveMarkerWest}>
+							<LeftArrow/>
+						</button>
+						<button
+							class="navbuttons"
+							id="Return"
+							disabled={this.state.returnDisabled}
+							onClick={this.returnButton} >
+							<LocateButton/>
+						</button>
+					</div>
+				</div>
+				<button id="Start" 
+				disabled={this.state.startButton} 
+				onClick={this.startButton}>
 					Start Game
 				</button>
 				<button
 					id="Guess"
 					disabled={this.state.guessDisabled}
-					onClick={this.guessButton}
-				>
+					onClick={this.guessButton}>
 					Guess
+				</button>
+				<button
+					id="Return"
+					disabled={this.state.returnDisabled}
+					onClick={this.returnButton}>
+					Return
 				</button>
 				<button
 					id="Quit"
 					disabled={this.state.quitDisabled}
-					onClick={this.quitButton}
-				>
-					Quit
+					onClick={this.quitButton}>
+					I Give Up!
 				</button>
 			</div>
 		);
@@ -176,3 +332,5 @@ class App extends React.Component {
 }
 
 ReactDOM.render(<App />, document.getElementById("root"));
+
+export default App;

@@ -1,14 +1,89 @@
 #modalbox {
-  display: none;
   position: fixed;
   z-index: 400;
-  left: 50%;
-  top: 50%;
-  width: 20%; /* Full width */
-  height: 20%; /* Full height */
+  left: 35%;
+  top: 30%;
+  width: 15%; /* Full width */
+  height: 15%; /* Full height */
   overflow: auto; /* Enable scroll if needed */
   background-color: rgb(0,0,0); /* Fallback color */
   background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
   color: white;
   text-align: center;
+}
+
+#latlon {
+  background-color: yellow;
+  border-color: Red;
+  display: none;
+}
+
+#score {
+  display: inline-block;
+  position: fixed;
+  z-index: 1000;
+  border-color: black;
+  color:white;
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  border-width: 3px;
+  border-style: solid;
+  margin-left: calc(80px + 84.925px) ;
+}
+
+#mapbox {
+  display: flex;
+  justify-content: space-around;
+  align-items: baseline;
+}
+
+#vermontmap {
+  height: 67vh;
+  align-self: center;
+}
+
+#navbox{
+  display: inline-block;
+  position: fixed;
+  z-index: 400;
+  left: 10%;
+  top: 45%;
+}
+
+.navbuttons {
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  border-color:  rgba(22, 5, 5, 0.4);
+  font-weight: bold;
+  color: white;
+  text-align: center;
+}
+
+#navgrid {
+  display: grid;
+  grid-template-rows: 50px 50px 50px; 
+  grid-template-columns: 50px 50px 50px;
+  grid-template-areas: ". N ."
+                      "W R E"
+                      ". S ."
+}
+
+#N {
+  grid-area: N;
+}
+
+#S {
+  grid-area: S;
+}
+
+#E {
+  grid-area: E;
+}
+
+#W {
+  grid-area: W;
+}
+
+#Return {
+  grid-area: R;
 }

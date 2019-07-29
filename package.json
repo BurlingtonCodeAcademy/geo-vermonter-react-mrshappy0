@@ -1,9 +1,10 @@
-{
+{ "proxy": "http://localhost:5000",
   "name": "geo-vermonter-react",
   "version": "1.0.0",
   "description": "A geographic guessing game in Vermont",
   "dependencies": {
     "@mapbox/leaflet-pip": "^1.1.0",
+    "express": "^4.17.1",
     "leaflet": "^1.5.1",
     "leaflet-pip": "^1.1.0",
     "react": "^16.8.6",
