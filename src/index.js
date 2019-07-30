@@ -33,9 +33,8 @@ class App extends React.Component {
 			counties: L.geoJSON(counties),
 			confirmation: true,
 			isGuessCorrect: false,
-			latLonStyle: 
-				"none" 
-			,
+			latLonStyle: "none", 
+			currentPlayer: ""
 		};
 		this.moveMarkerNorth = this.moveMarkerNorth.bind(this);
 		this.moveMarkerSouth = this.moveMarkerSouth.bind(this);
@@ -61,20 +60,26 @@ class App extends React.Component {
 	}
 
 	async handleSubmit(evt){
+		this.setState({
+			currentPlayer: this.state.input,
+		})
 		evt.preventDefault();
 		const response = await fetch('/scores', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body:	JSON.stringify({scores: this.state.input})
+			body:	JSON.stringify({
+				name: this.state.currentPlayer,
+				score: this.state.currentScore.score
+			})
 		});
 		const results = await response.text();
 		if (results === 'Success') {
 			const nextResponse = await fetch('/scores')
 			const json = nextResponse.json()
 			this.setState({
-				scores: json.scores,
+				score: json.score,
 				date: json.date
 			});
 		}
@@ -245,37 +250,33 @@ class App extends React.Component {
 					<img src = {vermontMap} alt="Vermont Map" id="vermontmap"/>	
 				</div>
 				<div>
-					Current markerPosition: lat: {startingPosition.lat}, lng:{" "}
-					{startingPosition.lng}
-					<div id="counties">
-						Addison, Bennington, Caledonia, Chittenden, Essex, Franklin, Grand
-						Isle, Lamoille, Orange, Orleans, Rutland, Washington, Windham,
-						Windsor
-					</div>
+					Current markerPosition: lat: {startingPosition.lat}, lng:{startingPosition.lng}
 					<div id="modalbox" style={this.state.confirmation ? {display: "none"} : {display: "block"}}>
-						<form action="">
-  						<select name="counties" id="countyselect">
-    						<option value="Addison">Addison</option>
-    						<option value="Bennington">Bennington</option>
-    						<option value="Caledonia">Caledonia</option>
-    						<option value="Chittenden">Chittenden</option>
-								<option value="Essex">Essex</option>
-								<option value="Franklin">Franklin</option>
-								<option value="Grand Isle">Grand Isle</option>
-								<option value="Lamoille">Lamoille</option>
-								<option value="Orange">Orange</option>
-								<option value="Orleans">Orleans</option>
-								<option value="Rutland">Rutland</option>
-								<option value="Washington">Washington</option>
-								<option value="Windham">Windham</option>
-								<option value="Windsor">Windsor</option>
-  						</select>
-  							<br></br>
-								<input type="button" id="modalGuess" value="Guess" onClick={this.confirmButton}></input>
-								<button id="cancel" onClick={this.quitButton}>
-									Cancel
-								</button>
-						</form>
+						<div id="modalgrid">
+							<form action="">
+								<select name="counties" id="countyselect">
+									<option value="Addison">Addison</option>
+									<option value="Bennington">Bennington</option>
+									<option value="Caledonia">Caledonia</option>
+									<option value="Chittenden">Chittenden</option>
+									<option value="Essex">Essex</option>
+									<option value="Franklin">Franklin</option>
+									<option value="Grand Isle">Grand Isle</option>
+									<option value="Lamoille">Lamoille</option>
+									<option value="Orange">Orange</option>
+									<option value="Orleans">Orleans</option>
+									<option value="Rutland">Rutland</option>
+									<option value="Washington">Washington</option>
+									<option value="Windham">Windham</option>
+									<option value="Windsor">Windsor</option>
+								</select>
+									<br></br>
+									<input type="button" id="modalGuess" value="Guess" onClick={this.confirmButton}></input>
+									<button id="cancel" onClick={this.quitButton}>
+										Cancel
+									</button>
+							</form>
+						</div>
 					</div>
 					<div id="modalwinbox"> </div>
 					<div id="latlon" style={this.state.isGuessCorrect ? {display: "inline-block"} : {display: "none"}}>Latitude: {this.state.markerReveal.lat}, Longitude: {this.state.markerReveal.lng} County: {this.state.countyReveal}</div>

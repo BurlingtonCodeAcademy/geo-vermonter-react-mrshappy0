@@ -14,7 +14,6 @@ app.get('/scores', (request, response) => {
   console.log(theFile);
   const buffer =  fs.readFileSync(theFile);
   const json = JSON.parse(buffer);
-  json.date = (new Date()).toLocaleDateString()
   response.type('json').send(json);
   console.log('The JSON: ', json)
 })
@@ -22,9 +21,11 @@ app.get('/scores', (request, response) => {
 app.post('/scores', 
 express.json(),
 (req, res) => {
-  console.log('POST received, body is: ', req.body);
   const theFile = $path.join(dataPath, 'scores.json');
-  fs.writeFileSync(theFile, JSON.stringify(req.body));
+  const oldFile = fs.readFileSync(theFile);
+  const jsonData = JSON.parse(oldFile); 
+  jsonData.highScores.push(req.body);
+  fs.writeFileSync(theFile, JSON.stringify(jsonData));
   res.status(201).send('Success');
 })
   

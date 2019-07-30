@@ -4,8 +4,10 @@ import borderData from "./border";
 import leafletPip from "leaflet-pip"
 
 const style = {
-	width: "50%",
-	height: "67vh"
+	width: "70%",
+  height: "75vh",
+  border: "solid",
+  marginRight: "1vw",
 };
 
 class Map extends React.Component {
